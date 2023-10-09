@@ -1,0 +1,10 @@
+django
+djangorestframework
+django-cors-headers
+djangorestframework-jwt
+Pillow
+celery[redis]
+redis
+djangorestframework_simplejwt
+drf-yasg
+django-filter
