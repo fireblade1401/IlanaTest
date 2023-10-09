@@ -18,9 +18,14 @@ from .serializers import UserProfileSerializer, OrderSerializer
 
 
 class UserProfileListView(generics.ListAPIView):
-    queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
     filter_class = UserProfileFilter
+
+    def get_queryset(self):
+        phone_number = self.kwargs.get('phone_number', None)
+        if phone_number:
+            return UserProfile.objects.filter(phone_number=phone_number)
+        return UserProfile.objects.none()
 
 
 class OrderListView(generics.ListCreateAPIView):
@@ -57,13 +62,24 @@ def register(request):
     serializer = UserProfileSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
-        user.set_password(serializer.validated_data['password'])
-        user.save()
         refresh = RefreshToken.for_user(user)
-        return Response({'access_token': str(refresh.access_token)}, status=status.HTTP_201_CREATED)
+        return Response({
+            'access_token': str(refresh.access_token),
+            'refresh_token': str(refresh)
+        }, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+login_request_body = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'phone_number': openapi.Schema(type=openapi.TYPE_STRING, description='Phone number'),
+        'password': openapi.Schema(type=openapi.TYPE_STRING, description='Password')
+    }
+)
+
+
+@swagger_auto_schema(method='post', request_body=login_request_body)
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):

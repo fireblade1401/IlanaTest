@@ -6,10 +6,10 @@ from datetime import date
 
 
 class UserProfile(AbstractBaseUser):
+    username = models.CharField(max_length=150, unique=True)
     phone_number = models.CharField(max_length=15)
     birth_date = models.DateField()
     profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
-
     USERNAME_FIELD = 'phone_number'
 
     @property
@@ -17,6 +17,9 @@ class UserProfile(AbstractBaseUser):
         today = date.today()
         return today.year - self.birth_date.year - (
                     (today.month, today.day) < (self.birth_date.month, self.birth_date.day))
+
+    def __str__(self):
+        return self.username
 
 
 class Order(models.Model):

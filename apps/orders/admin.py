@@ -18,9 +18,9 @@ class OrderAdmin(admin.ModelAdmin):
 
 
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('phone_number', 'birth_date',)
+    list_display = ('username', 'phone_number', 'birth_date',)
     list_filter = ('phone_number', 'birth_date')
-    search_fields = ('phone_number', 'birth_date', 'first_name', 'last_name')
+    search_fields = ('username', 'phone_number', 'birth_date', 'first_name', 'last_name')
     readonly_fields = ('age',)
 
 

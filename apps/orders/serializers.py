@@ -10,7 +10,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ('id', 'username', 'phone_number', 'birth_date', 'password', 'age', 'profile_image')
-        read_only_fields = ('phone_number',)
+
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        user = UserProfile(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
 
 
 class AttachmentSerializer(serializers.ModelSerializer):
