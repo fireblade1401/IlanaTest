@@ -24,6 +24,8 @@ SECRET_KEY = 'n*4lgf)*7ua$^t#@o#td-rmgrr7p+li0*(cj@!1gp_)h562a@z'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+AUTH_USER_MODEL = 'orders.UserProfile'
+
 ALLOWED_HOSTS = ['*']
 
 # Application definition

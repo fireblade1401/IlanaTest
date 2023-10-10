@@ -4,7 +4,6 @@ from .models import UserProfile, Order, Attachment
 
 class UserProfileSerializer(serializers.ModelSerializer):
     age = serializers.ReadOnlyField()
-    username = serializers.ReadOnlyField()
     password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
 
     class Meta:
@@ -40,3 +39,29 @@ class OrderSerializer(serializers.ModelSerializer):
             Attachment.objects.create(order=order, file=attachment)
 
         return order
+
+
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = UserProfile.USERNAME_FIELD
+
+    def validate(self, attrs):
+        self.user = self.user_authenticate(phone_number=attrs[self.username_field], password=attrs['password'])
+        if self.user is None:
+            raise serializers.ValidationError('Неверные учетные данные')
+        return super().validate(attrs)
+
+    def user_authenticate(self, phone_number, password):
+        try:
+            user = UserProfile.objects.get(phone_number=phone_number)
+            if user.check_password(password):
+                return user
+        except UserProfile.DoesNotExist:
+            return None
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
